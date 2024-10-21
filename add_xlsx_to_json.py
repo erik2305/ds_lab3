@@ -6,9 +6,9 @@ import json
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, Timestamp):
-            return obj.strftime('%d/%m/%Y %H:%M')  # Convert to DD/MM/YYYY h:mm format
+            return obj.strftime('%d/%m/%Y %H:%M')
         if isinstance(obj, time):
-            return obj.strftime('%H:%M')  # Convert time to h:mm format
+            return obj.strftime('%H:%M')
         return super().default(obj)
 
 json_file_path = 'cleaned_boarding_data.json'

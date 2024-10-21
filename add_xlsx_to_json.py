@@ -1,5 +1,15 @@
 import pandas as pd
+from pandas import Timestamp
+from datetime import time
 import json
+
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Timestamp):
+            return obj.strftime('%d/%m/%Y %H:%M')  # Convert to DD/MM/YYYY h:mm format
+        if isinstance(obj, time):
+            return obj.strftime('%H:%M')  # Convert time to h:mm format
+        return super().default(obj)
 
 json_file_path = 'cleaned_boarding_data.json'
 with open(json_file_path, 'r') as f:
@@ -34,7 +44,7 @@ def update_flights_data(row, flights_data):
                 'DepartTime': row['DepartTime'],
                 'FlightNumber': row['FlightNumber'],
                 'CodeShare': row.get('CodeShare', 'N/A'),
-                'ArrivalCity': row['ArrivalCity']
+                'ArrivalCity': row.get('ArrivalCity', 'Unknown')
             }
             if 'TicketNumber' in row:
                 new_flight['TicketNumber'] = row['TicketNumber']
@@ -45,6 +55,6 @@ def update_flights_data(row, flights_data):
 df_second_table.apply(update_flights_data, axis=1, flights_data=flights_data)
 
 with open(json_file_path, 'w') as f:
-    json.dump(flights_data, f, indent=4)
+    json.dump(flights_data, f, indent=4, cls=CustomJSONEncoder)
 
 print(f"Updated flights data saved to {json_file_path}")
